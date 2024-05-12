@@ -551,10 +551,12 @@
                 if(name!= '' && email!='' && message1!=''){
                     Email.send({
                         Host : "smtp.elasticemail.com",
-                        Username : "binarydigitofficial@gmail.com",
-                        Password : "510C8C5890093D4B1794BE2681D2FC7F6F2E",
-                        To : "binarydigitofficial@gmail.com",
-                        From : "binarydigitofficial@gmail.com",
+			/* Replace the following vlues according to your elasticemail account */
+                        Username : "username",
+		    	Password : "password",
+		    	To : 'them@website.com',
+		    	From : "you@isp.com",
+			/* ================================================================= */
                         Subject : "Contact enquiry form Weatherino",
                         Body : "Name: "+ name+ "<br/>Email: "+ email+ "<br/>message: "+ message1
                     }).then(
@@ -648,7 +650,6 @@
                 };
             };
         </script>
-        <script src="https://kit.fontawesome.com/124cc9a039.js" crossorigin="anonymous"></script>
         <script src="https://smtpjs.com/v3/smtp.js">
         </script>
         <script>
