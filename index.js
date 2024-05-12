@@ -15,7 +15,7 @@ var loading= document.getElementById("loader");
 const days = [ 'Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
 const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 
-const API_KEY = '67026f69f0a11b549ae71c22b8df0590';
+const API_KEY = /* Paste Openweathermap api here */ ;
 
 if ('scrollRestoration' in history) {
     history.scrollRestoration = 'manual';
