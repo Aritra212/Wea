@@ -1,0 +1,1308 @@
+<html>
+    <head>
+        <title>Weatherino</title>
+        <meta name="viewport" content="width=device-width, initial-scal=1.0">
+        <script src="https://kit.fontawesome.com/124cc9a039.js" crossorigin="anonymous"></script>
+        
+        <style>
+            *{
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+            html {
+                font-family: sans-serif;
+            }
+            a
+            {
+                text-decoration: none;
+            }
+            #body{
+                overflow: unset;
+            }
+            #loader{
+                background: #fff url(images/loader.gif) no-repeat center;
+                background-size: 50%;
+                height: 100vh;
+                width: 100%;
+                position: absolute;
+                z-index: 17;
+            }
+            .wrapper
+            {
+                width: 80%;
+                margin: 0 auto;
+            }
+            
+            .wrapper p
+            {
+                line-height: 2;
+                margin-bottom: 20px;
+            }
+
+            /* Top nav */
+
+            .top-nav {
+                position: sticky;
+                top: 0;
+                background-color: #1d2c2c;
+                padding: 10px 0;
+                z-index: 20;
+                border-bottom: solid 3px #fcfcfc;
+            }
+            .top-nav .wrapper {
+                display: flex;
+                justify-content: space-between;
+            }
+
+            .top-nav nav{
+                display: flex;
+                width: 100%;
+                margin: 4px 0px;
+            }
+            .top-nav nav .webname a{
+                color: #fff;
+                text-decoration: none;
+                margin: 0px 25px;
+                text-transform: uppercase;
+                font-size: 16px;
+            }
+            .top-nav nav ul{
+                list-style: none;
+                display: flex;
+                width: 60%;
+                margin: 0 auto;
+            }
+            .top-nav nav ul li a {
+                color: #fff;
+                text-decoration: none;
+                margin: 0 25px;
+                text-transform: uppercase;
+                font-size: 12px;
+            }
+            .top-nav nav ul li  a:hover,
+            .top-nav .page-active,
+            footer .page-active {
+                text-decoration: underline;
+                color: #d68c45;
+            }
+
+            /* messages */
+
+            .center{
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+            }
+            .alert ,
+            .location-alert{
+                display: block;
+                width: 350px;
+                padding: 30px 20px;
+                background-color: #f5f5f5;
+                border-radius: 10px;
+                box-sizing: border-box;
+                z-index: 15;
+                text-align: center;
+                opacity: 0;
+                top: -200%;
+                transform: translate(-50%, -50%) scale(0.5);
+                transition: opacity 300ms ease-in-out,
+                            top 1000ms ease-in-out,
+                            transfrom 1000ms ease-in-out;
+            }
+            .alert.active,
+            .location-alert.active{
+                opacity: 1;
+                top: 50%;
+                transform: translate(-50%, -50%) scale(1);
+                transition: transfrom 300ms cubic-bezier(0.18, 0.89, 0.43, 1.19);
+            }
+            .alert .title,
+            .location-alert .title{
+                margin: 10px 0px;
+                font-size: 30px;
+                font-weight: 600;
+            }
+            .alert .message,
+            .location-alert .message{
+                color: #0000008f;
+                font-size: 15px;
+                font-weight: 600;
+                padding: 5px;
+                text-align: justify;
+            }
+            .alert .buttons{
+                margin: 20px 30px;
+                display: flex;
+                justify-content: space-between;
+            }
+            .location-alert .buttons{
+                margin: 20px 30px;
+                float: right;
+            }
+            .alert .buttons .button,
+            .location-alert .buttons .button{
+                padding: 10px 20px;
+                background: #111;
+                color: #f5f5f5;
+                border: 2px solid #111;
+                font-size: 16px;
+                font-weight: 600;
+                outline: none;
+                border-radius: 10px;
+                cursor: pointer;
+                transition: all 300ms ease-in-out;
+            }
+            .alert .buttons .button:hover,
+            .location-alert .buttons .button:hover{
+                color: #111;
+                background: #f5f5f5;
+            }
+            .alert > div,
+            .location-alert > div{
+                position: relative;
+                top: 0px;
+                opacity: 1;
+            }
+            .alert.active > div
+            .location-alert.active >div{
+                top: 0px;
+                opacity: 1;
+            }
+            .alert.active .title,
+            .location-alert.active .title{
+                transition: all 300ms ease-in-out 300ms;
+            }
+            .alert.active .message,
+            .location-alert.active .message{
+                transition: all 300ms ease-in-out 350ms;
+            }
+            .alert.active .buttons
+            .location-alert.active .buttons{
+                transition: all 300ms ease-in-out 400ms;
+            }
+            /* header section */
+
+            .header-wrapper {
+                width: 100%;
+                margin: 0px auto;
+                background-image: url(images/img4.jpg);
+                background-size: cover;
+                background-repeat: no-repeat;
+                background-position: center;
+                /* background-color: #000; */
+                height: 100vh;
+            }
+            .header-wrapper .header-weather{
+                width: 80%;
+                margin: 0 auto;
+                padding: 20px;
+                padding-top: 50px;
+                color: #fff;
+                font-family: sans-serif;
+                display: flex;
+                justify-content: space-between;
+            }
+            .header-wrapper .header-weather .header-time-outer .header-time{
+                font-size: 35px;
+                display: flex;
+                justify-content: start;
+            }
+            .header-wrapper .header-weather .header-time-outer .header-time .am-pm{
+                font-size: 15px;
+                padding-top: 15px;
+                padding-left: 5px;
+            }
+            .header-wrapper .header-weather .header-time-outer .header-date {
+                padding-left: 5px;
+            }
+            .header-wrapper .header-weather .header-time-outer .header-time-zone {
+                font-size: 20px;
+                padding-left: 5px;
+            }
+            .header-wrapper .header-weather .header-weather-data {
+                display: flex;
+                justify-content: space-between;
+                background-color: #0000008f;
+                padding: 15px;
+                border-radius: 5px;
+            }
+            .header-wrapper .header-weather .header-weather-data .data-name {
+                padding-right: 5px;
+                font-size: 18px;
+                font-weight: bold;
+            }
+            .header-wrapper .header-weather .header-weather-data .data-value div{
+                padding-left: 5px;
+                padding-bottom: 3px;
+            }
+            .header-wrapper .header_search {
+                width: 60%;
+                padding: 5px;
+                padding-left: 10px;
+                border-radius: 20px;
+                border: solid 5px #d68c45;
+                margin: 0px auto;
+                margin-top: 25vh;
+                display: flex;
+                background-color: #00000070;
+            }
+            .header-wrapper .header_search input{
+                border: none;
+                width: 80%;
+                height: 20px;
+                background-color: transparent;
+                color:  #b7e4c7; 
+                font-weight: bold;
+                outline: none;  
+            }
+            .header-wrapper .header_search input::-webkit-search-cancel-button{
+                display: none;
+            }
+            .header-wrapper .header_search input::-webkit-input-placeholder{
+                color: #d68c45;
+                font-weight: bold;
+            }
+            .header-wrapper .header_search .search-button{
+                width: 30px;
+                cursor: pointer; 
+                background-image: url(images/search_icon.png);
+                background-repeat: no-repeat;
+                background-size: contain;
+                background-position: left;
+            }
+
+            /* Content Section 1 */
+
+            .weather-forecast
+            {
+                display: flex;
+                justify-content: space-between;
+                margin: 40px 0px;
+                padding: 20px;
+                background-color: #fcfcfc;
+                box-shadow: 0 4px 8px -2px rgba(0, 0, 0, 0.801);
+                overflow: hidden;
+            }
+            .weather-forecast .forecast{
+                width: 80%;
+                display: flex;
+                justify-content: space-between;
+                overflow-x: scroll;
+                scroll-behavior: smooth;
+                padding: 10px;
+            }
+            .weather-forecast .current-weather .time {
+                font-size: 25px;
+                display: flex;
+                justify-content: start;
+            }
+            .weather-forecast .current-weather .time .am-pm{
+                font-size: 12px;
+                padding-top: 10px;
+                padding-left: 5px;
+            }
+            .weather-forecast .current-weather .upper,
+            .weather-forecast .weather-data .upper{
+                display: flex;
+                justify-content: space-between;
+            }
+            .weather-forecast .current-weather .upper .day{
+                font-size: 20px;
+            }
+            .weather-forecast .current-weather .upper .date{
+                font-size: 15px;
+            }
+            .weather-forecast .current-weather .upper .time-zone {
+                font-size: 15px;
+                font-weight: bold;
+                margin-bottom: 5px;
+            }
+            .weather-forecast .current-weather .upper .weather{
+                font-size: 15px;
+                font-weight: bold;
+                margin-bottom: 15px;
+            }
+            .weather-forecast .weather-data,
+            .weather-forecast .current-weather{
+                padding: 20px;
+                margin-right: 10px;
+                background-color: rgb(32, 20, 49, 0.97);
+                color: #fcfcfc;
+                border-radius: 8px;
+            }
+            .weather-forecast .weather-data .upper{
+                text-align: left;
+            }
+            .weather-forecast .weather-data .upper .day{
+                font-size: 20px;
+            }
+            .weather-forecast .weather-data .upper .date{
+                font-size: 15px;
+            }
+            .weather-forecast .weather-data .upper .time-zone {
+                font-size: 15px;
+                margin-bottom: 5px;
+            }
+            .weather-forecast .weather-data .upper .weather{
+                font-size: 15px;
+                font-weight: bold;
+                margin-bottom: 15px;
+            }
+            .weather-forecast .weather-data .lower,
+            .weather-forecast .current-weather .lower {
+                display: flex;
+                justify-content: space-between;
+                width: 200px;
+                padding: 10px;
+                border-top: solid 2px rgb(192, 189, 189);
+            }
+            .weather-forecast .weather-data .lower .data-name,
+            .weather-forecast .current-weather .lower .data-name{
+                font-weight: bold;
+            }
+
+
+            /* Table */
+            .table-container{
+                display: flex;
+                background-color: rgba(148, 127, 68, 0.712);
+                overflow: hidden;
+            }
+            .table-container .weather{
+                height: 70px;
+            }
+            .table-container .data-name-column{
+                font-size: 18px;
+                font-weight: bold;
+                font-family: Georgia, 'Times New Roman', Times, serif;
+                border: solid  2px black;
+            }
+            .table-container .table-values{
+                display: flex;
+                overflow-x: scroll;
+            }
+            .table-container .data-name-column .column{
+                border: solid  2px black;
+            }
+            .table-container .data-name-column .row{
+                padding: 15px 17px;
+                width: 250px;
+                text-align: left;
+                border : solid 2px black
+            }
+            .table-container .data-name-column .sub-row{
+                margin-top: 15px;
+                padding-top: 10px;
+                border-top : solid 2px black;
+            }
+            .table-container .table-values .row{
+                padding: 15px 17px;
+                font-size: 18px;
+                width: 150px;
+                text-align: center;
+                border-top: solid 2px black;
+                border-bottom: solid 2px black;
+            }
+            .table-container .table-values .column{
+                border: solid  2px black;
+            }
+            .table-container .table-values .sub-row{
+                margin-top: 15px;
+                font-size: 19px;
+                padding-top: 10px;
+                border-top : solid 2px black;
+            }
+            .table-container .table-values .sub-row:nth-child(1)
+            {
+                margin-top: 32px;
+            }
+            .table-container .table-values .row:nth-child(1){
+                font-size: 18px;
+                font-family: Georgia, 'Times New Roman', Times, serif;
+                font-weight: bold;
+            }
+
+            /* Content Section 2 */
+
+            .content-wrapper{
+                width: 100%;
+                padding: 20px;
+                margin-top: 50px;
+            }
+            .content-wrapper .heading{
+                font-size: 24px;
+                text-transform: uppercase;
+                margin-bottom: 36px;
+                position: relative;
+                font-weight: 600;
+            }
+            .content-wrapper .heading::after {
+                content: "";
+                position: absolute;
+                height: 3px;
+                width: 48px;
+                background-color: #ff9b59;
+                bottom: -8px;
+                left: 0;
+            }
+            .content-wrapper .content,
+            .content-wrapper .responsive_content{
+                display: flex;
+                padding: 10px;
+                width: fit-content;
+                margin: 0 auto;
+            }
+            .content-wrapper .safety{
+                width: 280px;
+                padding: 20px;
+                margin: 10px;
+                display: flex;
+                box-shadow: 0 4px 13px -3px rgba(0, 0, 0, 0.2);
+            }
+            .content-wrapper .safety .left{
+                width: 50px;
+                height: 50px;
+                background-size: cover;
+                border-radius: 50%;
+            }
+            .content-wrapper .safety .right{
+                width: 150px;
+                margin-top: 15px;
+                margin-left: 10px;
+                font-size: 18px;
+                font-weight: 600;
+            }
+            .content-wrapper .safety .right a{
+                text-decoration: none;
+                color: black;
+                cursor: pointer;
+            }
+            .content-wrapper .safety .right a:hover{
+                color: #d68c45;
+                text-decoration: underline;
+            }
+
+
+            /* Footer */
+
+            footer
+            {
+                background: #000;
+                color: #fcfcfc;
+                padding: 36px;
+                margin-top: 50px;
+            }
+
+            footer a {
+                text-decoration: none;
+                color: #fcfcfc;
+            }
+
+            footer a:hover {
+                text-decoration: underline;
+            }
+
+            footer .footer-container {
+                display: flex;
+            }
+
+            footer ul {
+                list-style: none;
+                margin-top: 16px;
+            }
+
+            footer ul li {
+                margin: 12px 8px;
+            }
+            footer p.copyright
+            {
+                pointer-events: none;
+                padding: 10px;
+                font-size: 15px;
+                text-align: center;
+                margin: 0px;
+            }
+            footer a:hover {
+                text-decoration: underline;
+                color: #fbaf61;
+            }
+            footer .footer-left,
+            footer .footer-center{
+                width: 30%;
+                margin: auto;
+                text-align: center;
+            }
+            footer .footer-left{
+                color: #fff;
+                text-decoration: none;
+                text-transform: uppercase;
+                font-size: 16px;
+                font-weight: 600;
+                text-decoration: underline;
+                
+            }
+            footer .footer-right{
+                width: 40%;
+            }
+            /* hidden items */
+
+            .top-nav .wrapper  .menu-bar ,
+            #mobile-menu-container,
+            #menu-close-icon {
+                display: none;
+            }
+            .weather-forecast .forecast .weather-data:nth-child(1),
+            .content-wrapper .responsive_content{
+                display: none;
+            }
+
+            /* Responsive */
+            @media (max-width:1065px){
+                .content-wrapper .content > div:last-child{
+                    display: none;
+                }
+                .content-wrapper .responsive_content { 
+                    display: flex;
+                }
+                .content-wrapper .safety {
+                    width: 250px;
+                    padding: 15px;
+                }
+            }
+            @media (max-width:890px) {
+                .top-nav nav ul{
+                    width: 100%;
+                    margin: 0px;
+                }
+                .top-nav nav ul li a{
+                    margin: 0px 20px;
+                }
+            }
+            @media (max-width:700px) {
+                
+                #loader{
+                    background-size: 60%;
+                }
+                .wrapper {
+                    width: 95%;
+                }
+                .header_search{
+                    width: 80%;
+                }
+            }
+            @media (max-width:600px){
+                .top-nav nav ul li a{
+                    font-size: 12px;
+                    margin: 0px 15px;
+                }
+                .header-wrapper .header_search{
+                    width: 75%;
+                }
+                .content-wrapper .content,
+                .content-wrapper .responsive_content {
+                    display: block;
+                }
+            }
+            @media (max-width:590px){
+                .weather-forecast .current-weather{
+                    padding: 10px;
+                }
+            }
+            @media (max-width:570px){
+
+                .header-wrapper .header-weather{
+                    flex-direction: column;
+                    width: fit-content;
+                    margin-left: 0px;
+                }
+                .header-wrapper .header-weather .header-weather-data{
+                    margin-top: 15px;
+                    margin-bottom: 40px;
+                }
+                .header-wrapper .header_search {
+                    margin-top: 0vh;
+                }
+                .weather-forecast .current-weather{
+                    display: none;
+                }
+                .weather-forecast .forecast .weather-data:nth-child(1){
+                    display: block;
+                }
+                .weather-forecast .forecast {
+                    width: 100%;
+                }
+            }
+            @media (max-width:580px){
+                
+                footer .footer-container{
+                    flex-direction: column;
+                }
+                footer .footer-left,
+                footer .footer-center,
+                footer .footer-right{
+                    width: 60%;
+                    text-align: center;
+                    margin: 0 auto;
+                    padding-bottom: 15px;
+                }
+            }
+            @media (max-width:530px){
+                #loader{
+                    background-size: 70%;
+                }
+                .top-nav nav ul li a{
+                    margin: 0px 9px;
+                }
+            }
+            @media (max-width:480px){
+                .top-nav .wrapper nav .top-nav-items{
+                    display: none;
+                }
+                .top-nav .wrapper .menu-bar{
+                    display: block;
+                }
+                .top-nav nav{
+                    width: 20%;
+                }
+                /* Mobile navigation menu */
+                #mobile-menu-container {
+                    display: none;
+                    position: fixed;
+                    flex-direction: column;
+                    background: #222222e8;
+                    height: 100vh;
+                    z-index: 200;
+                    left: 0;
+                    right: 0;
+                    top: 0;
+                    align-items: center;
+                    justify-content: center;
+                    transition: 500ms cubic-bezier(0.03,0.95,0.11,1.09);
+                }
+
+                #mobile-menu-container ul {
+                    list-style: none;
+                    text-align: center;
+                    display: flex;
+                    flex-direction: column;
+                }
+
+                #mobile-menu-container ul li {
+                    margin: 16px 0;
+                }
+
+                #mobile-menu-container ul li a {
+                    color: #fff;
+                    text-decoration: none;
+                    margin: 0 25px;
+                    text-transform: uppercase;
+                    font-size: 14px;
+                }
+                #mobile-menu-container ul li  a:hover {
+                    text-decoration: underline;
+                    color: #fbaf61;
+                }
+                #mobile-menu-container  .page-active {
+                text-decoration: underline;
+                color: #d68c45;
+                }
+                .mobile-menu-icon{
+                    margin: 0px 25px;
+                }
+                .mobile-menu-icon i.fa{
+                    color: #f5f5f5;
+                }
+                #menu-close-icon {
+                    display: block;
+                    z-index: 300;
+                    background-color: #222;
+                    cursor: pointer;
+                    padding: 16px;
+                    margin: 4px;
+                }
+
+                #menu-close-icon i.fa {
+                    color: #f5f5f5;
+                }
+                #menu-close-icon i.fa:hover, 
+                .mobile-menu-icon i.fa:hover{
+                    color: #fbaf61;
+                }
+
+                footer .footer-container{
+                    flex-direction: column;
+                }
+                footer .footer-left,
+                footer .footer-center,
+                footer .footer-right{
+                    text-align: center;
+                }
+                
+            }
+            @media (max-width:470px){
+                .table-container .data-name-column .row{
+                    width: 210px;
+                }
+            }
+            @media (max-width:440px){
+                .top-nav nav:nth-child(2){
+                    display: none;
+                }
+                .table-container .data-name-column .row{
+                    width: unset;
+                }
+            }
+            @media (max-width:420px){
+                .header-wrapper .header_search:nth-child(1) {
+                    flex-direction: column;
+                }
+            }
+            @media(max-width: 400px){
+               
+            }
+            @media(max-width: 370px){
+
+                #loader{
+                    background-size: 85%;
+                }
+                .header-wrapper .header_search {
+                    width: 90%;
+                }
+                /* messages */
+                .alert,
+                .location-alert{
+                    width: 250px;
+                }
+                .alert .buttons,
+                .location-alert .buttons{
+                    margin: 20px 0px;
+                }
+            }
+        </style>
+    </head>
+    <body id="body">
+
+
+        <!-- Menu bar -->
+        <div class="top-nav" id="topNav">
+            <div class="wrapper">
+                
+                <nav>
+                    <div class="webname"><a href="index.html"><ins><strong>Weatherino</strong></ins></a></div>
+                    <ul class="top-nav-items">
+                        <li><a href="#" class="page-active">Home</a></li>
+                        <li><a href="about.html">About</a></li>
+                        <li><a href="contact.html">Contact</a></li>
+                        <li class="gps-search" id="gps-button" onclick="locationData_gps()"><a href="#">GPS - search</a></li>
+                    </ul>
+                </nav>
+                <nav class="menu-bar">
+                    <div class="mobile-menu-icon" onclick="mobileMenu()">
+                        <i class="fa fa-bars"></i>
+                    </div>
+                    <div id="mobile-menu-container">
+                        <div id="menu-close-icon" onclick="normal()">
+                            <i class="fa fa-xmark"></i>
+                        </div>
+                        <ul>
+                            <li><a href="#" class="page-active">Home</a></li>
+                            <li><a href="about.html">About</a></li>
+                            <li><a href="contact.html">Contact</a></li>
+                            <li class="gps-search" id="gps-button" onclick="locationData_gps()"><a href="#">GPS - search</a></li>
+                        </ul>
+                    </div>
+                </nav>
+                
+            </div>
+        </div>
+
+        <!-- Preloader -->
+        <div id="loader"></div>
+
+        <!-- messages -->
+        <div class="alert center" id= "alert">
+            <div class="title">Click OK!!</div>
+            <div class="message">If you want to know the weather status in your area then please provide us the gps coordinate, to do so click 'Ok'.</div>
+            <div class="buttons">
+                <div class="button" id="dismiss1">cancel</div>
+                <div class="button" id="allow1">ok</div>
+            </div>
+        </div>
+        <div class="location-alert center" id="location-alert1">
+            <div class="title">Permission Denied!!</div>
+            <div class="message">Your browser don't allow us to access your location. Go to your browser settings and allow this site to access the location.</div>
+            <div class="buttons">
+                <a href="#"><div class="button" id="allow2">ok</div></a>
+            </div>
+        </div>
+
+        <!-- Header Section -->
+        <header id="Header">
+            <div class="header-wrapper">
+                <div class="header-weather">
+                    <div class="header-time-outer">
+                        <div class="header-time" id="time"><!--12:30--> <div class="am-pm" ><!--AM--></div></div>
+                        <div class="header-date" id="date"><!--06/09/2021--></div>
+                        <div class="header-time-zone" id="time-zone"> <!--New Delhi / India--> </div>
+                    </div>
+                    <div class="header-weather-data">
+                        <div class="data-name">
+                            <div>Humidity </div>
+                            <div>Temperature </div>
+                            <div>Wind speed </div>
+                            <div>Weather </div>
+                        </div>
+                        <div class="data-value" id="current-weather-values">
+                            <div><!--87 %--></div>
+                            <div><!--30 &deg;c--></div>
+                            <div><!--20 m/s--></div>
+                            <div><!--cloudy --></div>
+                        </div>
+                    </div>
+                </div>
+               <div class="header_search">
+                <div class="search-button" id="search-button1" onclick="locationData()"></div>
+                <input type="search"  class="search-box" onsearch="locationData()" placeholder="Enter city name"/>
+                <!-- <div class="gps-search" id="gps-button" onclick="locationData_gps()">GPS</div> -->
+               </div>
+            </div>
+        </header>
+
+        <!-- Content Section 1 -->
+        
+
+        <div class="wrapper">
+
+            <!-- 1 -->
+
+            <div class="weather-forecast">
+                <div class="current-weather" id="current-forecast1">
+                    <div class="upper">
+                        <div class="left">
+                            <div class="day"><!--Monday--></div>
+                            <div class="date"><!--06/09/2021--></div>
+                            <div class="time-zone"><!--New Delhi / India--></div>
+                        </div>
+                        <div class="right">
+                            <!-- <img src=" http://openweathermap.org/img/wn/10d@2x.png" /> -->
+                        </div>
+                    </div>
+                    <div class="lower">
+                        <div class="data-name">
+                            <div><!--Max Temp --></div>
+                            <div><!--Min Temp --> </div>
+                            <div><!--Humidity --></div>
+                            <div><!--Wind speed --></div>
+                        </div>
+                        <div class="data-value">
+                            <div><!--87 %--></div>
+                            <div><!--30 &deg;c--></div>
+                            <div><!--120 --></div>
+                            <div><!--20 m/s--></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="forecast" id="weather-forecast1">
+                    <div class="weather-data">
+                        <div class="upper"  id="weather-forecast1">
+                            <div class="left">
+                                <!--<img src=" http://openweathermap.org/img/wn/10d@2x.png" />-->
+                            </div>
+                            <div class="right" >
+                                <div class="day"><!--Tuesday--></div>
+                                <div class="date"><!--07/09/2021--></div>
+                                <div class="time-zone"><!--New Delhi / India--></div>
+                            </div>
+                        </div>
+                        <div class="lower">
+                            <div class="data-name">
+                                <div><!--Max Temp --></div>
+                                <div><!--Min Temp  --></div>
+                                <div><!--Humidity --></div>
+                                <div><!--Wind speed --></div>
+                            </div>
+                            <div class="data-value">
+                                <div><!--87 %--></div>
+                                <div><!--30 &deg;c--></div>
+                                <div><!--120 --></div>
+                                <div><!--20 m/s--></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                </div>
+            </div>
+
+            <!-- Table -->
+            <div class="table-container">
+                <div class="data-name-column">
+                    <div class="row">Day</div>
+                    <div class="row">Date</div>
+                    <div class="row">Temparature
+                        <div class="sub-row">Day</div>
+                        <div class="sub-row">Night</div>
+                        <div class="sub-row">Max</div>
+                        <div class="sub-row">Min</div>
+                    </div>
+                    <div class="row weather">Status</div>
+                    <div class="row">Humidity</div>
+                    <div class="row">Wind Speed</div>
+                    <div class="row">Pressure</div>
+                    <div class="row">Sunrise</div>
+                    <div class="row">Sunset</div>
+                    <div class="row">Moonrise</div>
+                    <div class="row">Moonset</div>
+                </div>
+                <div class="table-values" id="table-values">
+                    <div class="column">
+                        <div class="row"><!--Monday--></div>
+                        <div class="row"><!--06/10/2021--></div>
+                        <div class="row"> 
+                            <div class="sub-row"><!--30 &deg;c--></div>
+                            <div class="sub-row"><!--32 &deg;c--></div>
+                            <div class="sub-row"><!--33 &deg;c--></div>
+                            <div class="sub-row"><!--29 &deg;c--></div>
+                        </div>
+                        <div class="row weather"><!--Clear Sky--></div>
+                        <div class="row"><!--46%--></div>
+                        <div class="row"><!--2 m/s--></div>
+                        <div class="row"><!--1006--></div>
+                        <div class="row"><!--1006--></div>
+                        <div class="row"><!--1006--></div>
+                        <div class="row"><!--1006--></div>
+                        <div class="row"><!--1006--></div>
+
+                    </div>
+                </div>
+                
+            </div>
+
+        </div>
+
+        <!-- Content Section 2 -->
+        <div class="wrapper">
+            <div class="content-wrapper">
+                <div class="heading">
+                    Safety Tips 
+                </div>
+                <div class="content">
+                    <!-- Flood -->
+                    <div class="safety">
+                        <div class="left" style="background-image: url(images/flood.jpg);"></div>
+                        <div class="right"><a href="flood.html">Flood Safety Tips</a></div>
+                    </div>
+                    <!-- Drought -->
+                    <div class="safety">
+                        <div class="left" style="background-image: url(images/drought.jpg);"></div>
+                        <div class="right"><a href="#">Drought Safety Tips</a></div>
+                    </div>
+                    <!-- Thunderstrom -->
+                    <div class="safety">
+                        <div class="left" style="background-image: url(images/thunderstrom.jpg);"></div>
+                        <div class="right"><a href="#">Thunderstrom Safety Tips</a></div>
+                    </div>
+                </div>
+                <div class="content">
+                    <!-- Landslide -->
+                    <div class="safety">
+                        <div class="left" style="background-image: url(images/air_quality.jpg);"></div>
+                        <div class="right"><a href="#">Landslide Safety Tips</a></div>
+                    </div>
+                    <!-- Cyclone -->
+                    <div class="safety">
+                        <div class="left" style="background-image: url(images/forest_fire.jpg);border: 2px solid #d8d8d8;"></div>
+                        <div class="right"><a href="#">Cyclone Safety Tips</a></div>
+                    </div>
+                    <div class="safety">
+                        <div class="left" style="background-image: url(images/cyclone.jpg);"></div>
+                        <div class="right"><a href="#">Cyclone Safety Tips</a></div>
+                    </div>
+                </div>
+                
+                <div class="responsive_content">
+                    <div class="safety">
+                        <div class="left" style="background-image: url(images/thunderstrom.jpg);"></div>
+                        <div class="right"><a href="#">Thunder Safety Tips</a></div>
+                    </div>
+                    <div class="safety">
+                        <div class="left" style="background-image: url(images/cyclone.jpg);"></div>
+                        <div class="right"><a href="#">Cyclone Safety Tips</a></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Footer Section -->
+        <footer>
+            <div class="wrapper">
+                <div class="footer-container">
+                    <div class="footer-left">Weatherino</div>
+                    <div class="footer-center">
+                        <h4 class="list-title">Quick Links</h4>
+                        <ul>
+                            <li><a href="#" class="page-active">Home</a></li>
+                 
+                            <li><a href="about.html">About</a></li>
+                            <li><a href="contact.html">Contact us</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-right">
+                        <p class="copyright">This website is devloped by- Siliguri College( Dept. of Computer Science) <br/>&copy;2021-22</p>
+                    </div>
+                </div>
+            </div>
+        </footer>
+        
+        <script>
+            const timeEl = document.getElementById('time');
+            const dateEl = document.getElementById('date');
+            const timezoneEl = document.getElementById('time-zone');
+            const currentweathervaluesEl = document.getElementById('current-weather-values');
+            const weatherforecastEl = document.getElementById('weather-forecast1');
+            const currentforecastE1 = document.getElementById('current-forecast1');
+            const tableEl = document.getElementById('table-values');
+
+            const searchButton = document.querySelector('.search-button');
+            const gpsSearch = document.querySelector('.gps-search');
+            var inputValue = document.querySelector('.search-box');
+
+            const days = [ 'Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+            const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+
+            //const API_KEY = '67026f69f0a11b549ae71c22b8df0590';
+            //history.scrollRestoration = "manual";
+            //document.getElementById("Header").scrollIntoView({behavior: 'smooth'});
+            setInterval(()=>{
+                const time = new Date();
+                const month = time.getMonth();
+                const date = time.getDate();
+                const day = time.getDay();
+                const hour = time.getHours();
+                const hourIn12format = hour >= 13 ? hour %12 : hour ;
+                const minutes = time.getMinutes();
+                const ampm = hour >= 12 ? 'pm' : 'am';
+
+                timeEl.innerHTML = (hourIn12format  <10 ? '0'+ hourIn12format : hourIn12format) + ':' + (minutes <10 ? '0'+ minutes : minutes) + `<div class="am-pm">${ampm}</div>`;
+                dateEl.innerHTML = days[day]+ ', '+ date+ ' '+ months[month];
+                
+            },1000);
+            //locationData();
+
+            function locationData_gps(){
+                navigator.geolocation.getCurrentPosition((sucesss) => {
+                    let{latitude, longitude} = sucesss.coords;
+                    getweatherData(latitude, longitude);
+                });
+                handle_locationPermission();
+            }
+
+            function locationData(){
+
+                var latitude, longitude;
+                if(inputValue.value == ''){
+
+                        // message
+                        document.getElementById("alert").classList.add("active");
+                        alert_message1();
+
+                        latitude = 51.5085 //22.5697;
+                        longitude = -0.1257 //88.3697;
+                        getweatherData(latitude, longitude); 
+
+                }
+                else{
+                    fetch(`https://api.openweathermap.org/data/2.5/weather?q=`+inputValue.value+`&appid=${API_KEY}`).then(res => res.json()).then(data => {
+                        console.log(data);
+                        latitude = data.coord.lat;
+                        longitude = data.coord.lon;
+                        inputValue.value = '';
+                        getweatherData(latitude, longitude);
+                    })
+                    .catch(err => alert("Invalid name"));
+                }    
+            }
+            function getweatherData(latitude, longitude){
+                    console.clear();
+                    fetch(`https://api.openweathermap.org/data/2.5/onecall?lat=${latitude}&lon=${longitude}&exclude=hourly,minutely&units=metric&appid=${API_KEY}`).then(res => res.json()).then(data => {
+                        console.log(data);
+                        showweatherData(data);
+                    });
+            }
+
+            function showweatherData(data){
+                let{humidity, temp, wind_speed} = data.current;
+
+                currentweathervaluesEl.innerHTML = `
+                <div>${humidity} %</div>
+                <div>${temp} &deg;c</div>
+                <div>${wind_speed} m/s </div>
+                <div>${data.current.weather[0].description}</div>`;
+                timezoneEl.innerHTML = data.timezone;
+                
+                let tableDataforecast = '';
+                let dailyforecast = '';
+                let currentforecast = '';
+
+                data.daily.forEach((day, idx) => {
+                    
+                    if(idx == 0){
+                        currentforecast +=
+                        `<div class="upper">
+                            <div class="left">
+                                <div class="day">${window.moment(day.dt * 1000).format('dddd')}</div>
+                                <div class="date">${window.moment(day.dt * 1000).format('DD/MM/YYYY')}</div>
+                                <div class="time-zone">${data.timezone}</div>
+                                <div class="weather">${day.weather[0].description} </div>
+                            </div>
+                            <div class="right">
+                                <img src=" http://openweathermap.org/img/wn/${day.weather[0].icon}@2x.png" />
+                            </div>
+                        </div>
+                        <div class="lower">
+                            <div class="data-name">
+                                <div>Max Temp </div>
+                                <div>Min Temp  </div>
+                                <div>Humidity </div>
+                                <div>Wind speed </div>
+                            </div>
+                            <div class="data-value">
+                                <div>${day.temp.max} &deg;c</div>
+                                <div>${day.temp.min} &deg;c</div>
+                                <div>${day.humidity} %</div>
+                                <div>${day.wind_speed} m/s</div>
+                            </div>
+                        </div>`
+                    };
+                    
+                    dailyforecast +=
+                    `<div class="weather-data">
+                        <div class="upper"  id="weather-forecast1">
+                            <div class="left">
+                                <img src=" http://openweathermap.org/img/wn/${day.weather[0].icon}@2x.png" />
+                            </div>
+                            <div class="right" >
+                                <div class="day">${window.moment(day.dt * 1000).format('dddd')}</div>
+                                <div class="date">${window.moment(day.dt * 1000).format('DD/MM/YYYY')}</div>
+                                <div class="time-zone">${data.timezone}</div>
+                                <div class="weather">${day.weather[0].description} </div>
+                            </div>
+                        </div>
+                        <div class="lower">
+                            <div class="data-name">
+                                <div>Max Temp </div>
+                                <div>Min Temp  </div>
+                                <div>Humidity </div>
+                                <div>Wind speed </div>
+                            </div>
+                            <div class="data-value">
+                                <div>${day.temp.max} &deg;c</div>
+                                <div>${day.temp.min} &deg;c</div>
+                                <div>${day.humidity} %</div>
+                                <div>${day.wind_speed} m/s</div>
+                            </div>
+                        </div>
+                    </div>`
+
+                    tableDataforecast +=
+                    `<div class="column">
+                        <div class="row">${window.moment(day.dt * 1000).format('dddd')}</div>
+                        <div class="row">${window.moment(day.dt * 1000).format('DD/MM/YYYY')}</div>
+                        <div class="row"> 
+                            <div class="sub-row">${day.temp.day} &deg;c</div>
+                            <div class="sub-row">${day.temp.night} &deg;c</div>
+                            <div class="sub-row">${day.temp.max} &deg;c</div>
+                            <div class="sub-row">${day.temp.min} &deg;c</div>
+                        </div>
+                        <div class="row weather">${day.weather[0].description}</div>
+                        <div class="row">${day.humidity} %</div>
+                        <div class="row">${day.wind_speed} m/s</div>
+                        <div class="row">${day.pressure*100} Pa</div>
+                        <div class="row">${window.moment(day.sunrise * 1000).format('hh:mm a')} </div>
+                        <div class="row">${window.moment(day.sunset * 1000).format('hh:mm a')}</div>
+                        <div class="row">${window.moment(day.moonrise * 1000).format('hh:mm a')}</div>
+                        <div class="row">${window.moment(day.moonset * 1000).format('hh:mm a')}</div>
+
+                    </div>
+                    `
+                })
+                currentforecastE1.innerHTML = currentforecast;
+                weatherforecastEl.innerHTML = dailyforecast;
+                tableEl.innerHTML = tableDataforecast;
+            }
+
+            // Permissions
+            function handle_locationPermission(){
+                
+            document.getElementById("Header").scrollIntoView({behavior: 'smooth'});
+                navigator.permissions.query({name: 'geolocation'}).then(function(result){
+                    if(result.state == 'denied'){
+                        document.getElementById("location-alert1").classList.add("active");
+                        location_alert_message();
+                    }
+                })
+            }
+
+            // Messages
+            function alert_message1(){
+                
+                document.getElementById("allow1").addEventListener("click",function(){
+                    document.getElementById("alert").classList.remove("active");
+                    document.getElementById("body").style.overflow = "unset";
+                    locationData_gps();
+                });
+                document.getElementById("dismiss1").addEventListener("click",function(){
+                    document.getElementById("alert").classList.remove("active");
+                    document.getElementById("body").style.overflow = "unset";
+                });
+            }
+            function location_alert_message(){
+                
+            document.getElementById("Header").scrollIntoView({behavior: 'smooth'});
+                document.getElementById("allow2").addEventListener("click",function(){
+                    document.getElementById("location-alert1").classList.remove("active");
+                    document.getElementById("body").style.overflow = "unset";
+                });
+                document.getElementById("dismiss2").addEventListener("click",function(){
+                    document.getElementById("location-alert1").classList.remove("active");
+                    document.getElementById("body").style.overflow = "unset";
+                });
+            }
+        
+            // Responsive purpose
+            function mobileMenu()
+                {
+                    var click = document.getElementById("mobile-menu-container");
+                    if(click.style.display === "block")
+                    {
+                        click.style.display= "none";
+                    }
+                    else {
+                        click.style.display = "flex";
+                    }
+                    
+                }
+
+            function normal() {
+                var click = document.getElementById("mobile-menu-container");
+                if(click.style.display === "none")
+                {
+                    click.style.display= "block";
+                }
+                else {
+                    click.style.display = "none"
+                }
+            }
+
+        </script>
+        <script>
+            var loading= document.getElementById("loader");
+            window.addEventListener("load",function(){
+                loading.style.display= "none";
+            })
+        </script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js" integrity="sha512-qTXRIMyZIFb8iQcfjXWCO8+M5Tbc38Qi5WzdPOYZHIlZpzBHG3L3by84BBBOiRGiEb7KKtAOAs5qYdUiZiQNNQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        
+    </body>
+</html>
